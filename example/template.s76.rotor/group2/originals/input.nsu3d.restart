@@ -1,0 +1,64 @@
+                    NSU3D INPUT FILE (Version 3.0) 
+RESTARTF  RESTARTT  RNTCYC
+1.0       1.0       0.0
+RESTART FILE
+WRK0/restart.000000
+MMESH     NTHREAD
+1.0       1.0              (1st order = -1)
+NCYC      NPRNT     N MESH    MESHLEVEL   CFLMIN    RAMPCYC   TURBFREEZE   FVIS2  FSOLVER_TYPE
+50.       0.0       4.        1.0         1.0       0.0       0.0          0.0    1.0
+CFL       CFLV      ITACC     INVBC     ITWALL    TWALL
+1.0       1000.     2.0       0.0       0.0       0.0
+VIS 1     VIS 2     H FACTOR  SMOOP     NCYCSM
+0.0       20.       0.00      0.00      0.0
+C1        C2        C3        C4        C5        C
+0.5321    1.3711    2.7744
+FIL1      FIL2      FIL3      FIL4      FIL5      FIL6
+1.0       1.0       1.0
+----------------------------------------------------------------------
+COARSE LEVEL AND MULTIGRID PARAMETERS
+CFLC      CFLVC     SMOOPC    NSMOOC
+1.0       1000.     0.0       0.0
+VIS0      MGCYC     SMOOMG    NSMOOMG
+4.0       2.        0.8       2.0
+----------------------------------------------------------------------
+TURBULENCE EQUATION(S)
+ITURB     IWALLF    WALLDIST
+4.        0.0        1.0
+CT1       CT2        CT3      CT4       CT5       CT6
+1.0       1.0        1.0                        
+CTC1      CTC2       CTC3     CTC4      CTC5      CTC6
+1.0        1.0        1.0                                  
+VIST0  TSMOOMG   NTSMOOMG
+2.0        0.8        2.0
+----------------------------------------------------------------------
+MACH      Z-ANGLE   Y-ANGLE   RE         RE_LENGTH
+0.0        0.0       0.0      1.2E6      3.1
+----------------------------------------------------------------------
+FORCE/MOMENT COEFFICIENT PARAMETERS
+REF_AREA    REF_LENGTH XMOMENT  YMOMENT   ZMOMENT  ISPAN    REF_MACH
+19732.22785 56.04      0.0      0.0       0.0      2.0      0.65
+----------------------------------------------------------------------
+OPTIONAL LINEAR SOLVER
+NCYC_LINEAR_MG   NCYC_LINEAR_FG   NCYC_LINEAR_CG   ISOLVE_LINEAR
+5.                  -4.                 4.              1.
+NKRY             GMRESTART         LINEAR TOL
+200.                 1.               1.e-02
+----------------------------------------------------------------------
+OPTIONAL TIME ACCURATE PARAMETERS
+NTIME_STEP  DTACC    DT_REF_LENGTH   NTIME_STEP_OUT   MESHMOTION
+180.         0.25      -1.0           25.               -1.0 
+----------------------------------------------------------------------
+PRESCRIBED MESH ROTATION (for MESH MOTION = -1)
+X           Y        Z        OMEGAx    OMEGAy      OMEGAz
+0.0         0.0      0.0      0.0       0.0         0.01372395382
+----------------------------------------------------------------------
+MESH DATA FILE
+mesh_file.replicate
+----------------------------------------------------------------------
+OPTIONAL PARAMETERS (MODIFY FROM DEFAULT VALUES SET IN set_lim_values.f)
+PARAMETER NAME                           VALUE(real number with decimal)
+ILINE_SOLVE                              1.0 
+BIH_BNDY_FACTR                           1.0 
+ISARC                                    1.0
+ISAFE_MG                                 1.0

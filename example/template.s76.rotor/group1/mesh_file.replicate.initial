@@ -1,0 +1,32 @@
+NMESH
+4.
+MESH FILE NAMES and Transformations and Motion Definition
+/glade/work/kkara/regression_test/grids/s76blade_jay/s76blade_strand.part.432
+0.0 0.0 0.0   1.0 1.0 1.0    0.934868 -0.353844 0.028563 9.869974       0.0 0.0 0.0
+/glade/work/kkara/regression_test/grids/s76blade_jay/s76blade_strand.part.432
+0.0 0.0 0.0   1.0 1.0 1.0    0.110187 0.049678 0.992669 90.704203        0.0 0.0 0.0
+/glade/work/kkara/regression_test/grids/s76blade_jay/s76blade_strand.part.432
+0.0 0.0 0.0   1.0 1.0 1.0    -0.030440 -0.080423 -0.996296 179.718434    0.0 0.0 0.0
+/glade/work/kkara/regression_test/grids/s76blade_jay/s76blade_strand.part.432
+0.0 0.0 0.0   1.0 1.0 1.0    0.049921 -0.110724 -0.992597 90.143141      0.0 0.0 0.0
+
+
+pitch 9.23
+rotation rate rad/s 155.327504 u_tip 221.170832
+mach tip 0.649986
+omegaz: 0.540118 dtacc: 0.006213 dtacc_dg 0.008078
+rotation 0.934868 -0.353844 0.028563 9.869974
+rotation 0.110187 0.049678 0.992669 90.704203
+rotation -0.030440 -0.080423 -0.996296 179.718434
+rotation 0.049921 -0.110724 -0.992597 90.143141
+
+
+/glade/work/kkara/regression_test/grids/s76blade_jay/s76blade_strand.part.216
+0.0 0.0 0.0   1.0 1.0 1.0   0.943695 -0.329557 0.028833 10.593342     0.0 0.0 0.0
+/glade/work/kkara/regression_test/grids/s76blade_jay/s76blade_strand.part.216
+0.0 0.0 0.0   1.0 1.0 1.0   0.116734  0.056305 0.991566 90.791569     0.0 0.0 0.0
+/glade/work/kkara/regression_test/grids/s76blade_jay/s76blade_strand.part.216
+0.0 0.0 0.0   1.0 1.0 1.0  -0.030422 -0.087115 -0.995734 179.695002   0.0 0.0 0.0
+/glade/work/kkara/regression_test/grids/s76blade_jay/s76blade_strand.part.216
+0.0 0.0 0.0   1.0 1.0 1.0   0.056602 -0.117349 -0.991476 90.184153    0.0 0.0 0.0
+

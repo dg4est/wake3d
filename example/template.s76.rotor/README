@@ -1,0 +1,51 @@
+# ============================ #
+# 1. Set Solver Symbolic Links #
+# ============================ #
+Inside of the symlibs directors, symbolically link or copy your shared object
+solver libraries that you have compiled in your local directory.
+
+The input file for cdriver is already set up to point to the libraries inside
+the symlibs directory.
+
+# ============================ #
+# 2. Simulation Initialization #
+# ============================ #
+To setup the simulation to start from time step 0, run `./setup_initial.sh`.
+
+To verify that everything is setup correctly for starting the simulation:
+  a. Check each group directory if the symbolic links point to the *.initial files.
+  b. Check each solver's input file for the restart flags to be 0 or 0.0.
+  c. Check restart_count.txt contains the number 0 only.
+  d. Check input.driver has restart_counter: 0000000.
+
+# ===================== #
+# 3. Simulation Restart #
+# ===================== #
+Run `./setup_restart.sh'.
+
+This script will do the following procedures:
+  a. Move WRK directories in each group directory to the next restart_count.txt index.
+  b. Update restart_count.txt index automatically.
+  c. Reset the sympolic pointers in each group directory to point to the *.restart files.
+  d. Update the restart file input file indexes by scanning the checkpoint directories 
+     for the last checkpoint file.
+
+# Warning #
+NOTE: Do NOT run ./setup_restart.sh back-to-back immediately without running the simulation --
+      This can break the indexes set in each of the solver input files, thus the user will 
+      need to manually update each file to get it to a correct state.
+      Also, you will need to also fix restart_count.txt manually to your last successful
+      run count id.
+
+----------------------------------------------------------------------------------------------
+# How To Fix Broken Input File #
+Go into the WRK# or WRK#/checkpoint/ directory and check the file index you want to restart.
+Manually update the input files (input.dg4est.v2/input.nsu3d) to have the correct file path
+for the restart file.
+
+Restart Path Name Locations:
+group0: input.dg4est.v2 -- line 34 (e.g restart_file: WRK0/checkpoint/soln_0000000.bin)
+group1: input.nsu3d -- line 4 (e.g. WRK0/restart.000000)
+group2: input.nsu3d -- line 4 (e.g. WRK0/restart.000000)
+
+

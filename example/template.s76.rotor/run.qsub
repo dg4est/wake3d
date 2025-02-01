@@ -1,0 +1,20 @@
+#!/bin/bash -l
+#PBS -N WAKE3D-S76
+#PBS -A WYOM0162
+#PBS -l walltime=12:00:00
+#PBS -r n
+#PBS -q regular
+#PBS -k eod
+#PBS -j oe
+#PBS -l select=109:ncpus=36:mpiprocs=36
+
+export TMPDIR=/glade/scratch/$USER/temp
+mkdir -p $TMPDIR
+
+export MPI_IB_CONGESTED=1
+module li
+
+# VisIt Libsim
+source /glade/work/akirby/wake3d-codes/mpt/2.19/codes/visit_libsim_interface/visit_extract.v4/env.sh.n
+
+mpiexec_mpt -n 3924 ./wake3d.mpi input.driver > log.1

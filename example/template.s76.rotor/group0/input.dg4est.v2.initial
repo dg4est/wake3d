@@ -1,0 +1,258 @@
+                        DG4EST INPUT FILE (Version 2.0)
+                              CartDG (Version 3.0)
+===============================================================================
+#                                DG4EST INPUTS                                #
+===============================================================================
+------------
+# Log Info #
+------------
+log_display: 0                # Logging options:
+                              #   [0]: log all
+                              #   [1]: prefix file and line number
+                              #   [2]: information on the internal state
+                              #   [3]: information on conditions, decisions
+                              #   [4]: main function information
+                              #   [5]: consistency/performance information
+                              #   [6]: major API function information
+                              #   [7]: few lines max per program
+                              #   [8]: errors only
+                              #   [9]: log none
+-----------
+# File IO #
+-----------
+checkpoint_interval: 30       # interval to output checkpoint file
+visualization_interval: 1     # interval to output visualization file
+flowstatistics_interval: 1    # interval to output flow statistics file
+analytic_solution_norm: 0     # output analytic solution norm flag
+-----------
+# Restart #
+-----------
+# CHANGE FOR RESTART
+restart_flag: 0               # Restart flag options:
+                              #   [0]: restart OFF
+                              #   [1]: restart ON
+restart_file: WRK0/checkpoint/soln_0000000.bin
+-------------------
+# Structured Grid #
+-------------------
+nelem: 20 20 4                # x-elements y-elements z-elements
+domain_lo: -600.0 -600.0 -120.0     # xlo ylo zlo
+domain_hi:  600.0  600.0  120.0     # xhi yhi zhi
+periodic_flag: 0 0 0          # x-flag y-flag z-flag
+                              #   [0]: periodic OFF 
+                              #   [1]: periodic ON
+---------------------
+# Unstructured Grid #
+---------------------
+unstructured_flag: 0          # Unstructured grid flag:
+                              #   [0]:   structured grid
+                              #   [1]: unstructured grid
+unstructured_file: grids/naca0012.inp
+-----------------
+# Time Stepping #
+-----------------
+time_formulation: 1           # Time stepping formulation options:
+                              #   [0]: Steady state
+                              #   [1]: Standard time stepping
+                              #   [2]: Dual time stepping
+time_scheme: 3                # Time stepping scheme options: 
+                              #   [1]: Explicit RK-1, 1st-Order
+                              #   [2]: Explicit RK-2, 2nd-Order
+                              #   [3]: Explicit RK-3, 3rd-Order
+                              #   [4]: Explicit RK-4, 4th-Order
+time_scheme_dual: 2           # Dual time stepping scheme options:
+                              #   [1]: BDF1
+                              #   [2]: BDF2
+time_steps: 100               # Number of global time steps
+cfl: 0.500000                 # CFL number scales dt (max: 0.5)
+dt: 1.00000                   # Local maximum time step
+wake3d_dt: 3.179348e-01       # Global time step size
+                              # wake3d_dt = DTACC * DT_REF_LENGTH / sqrt(gamma) / REF_MACH
+ncyc: 1000                    # Number of linear iterations (steady state/dual time steps)
+dual_conv_drop_tol: 1.0       # Dual time stepping convergence drop tolerance (orders of mag.)
+convergence_tol: 1.0e-16      # Convergence tolerance
+-------------
+# Multigrid #
+-------------
+multigrid_scheme: 0           # Multigrid scheme options:
+                              #   [0]: Multigrid OFF
+                              #   [1]: FAS V-Cycle
+                              #   [2]: FAS F-Cycle
+                              #   [3]: FAS W-Cycle
+multigrid_ncycles: 10         # Maximum multigrid cycles per step
+multigrid_smooth_fac: 0.8     # Correction smoothing factor (0.2-1.2)
+multigrid_nsweeps: 10         # Maximum smoothing sweeps on each level
+multigrid_nsweeps_init: 0     # Initial smoothing sweeps on each level
+multigrid_p_levels: 4         # Number of multigrid levels
+MG0: 3   5   0                # MG{Level}: p-degree ncyc_smooth ncyc_post_smooth
+MG1: 2   5   0
+MG2: 1   5   0
+MG3: 0   5   0
+--------------
+# AMR Levels #
+--------------
+max_amr_level: 9              # Maximum amr level number
+min_amr_level: 0              # Minimum amr level number
+----------
+# Regrid #
+----------
+regrid_interval: 1            # Global time step regrid interval
+regrid_strategy: 1            # Regrid strategy options:
+                              #   [1]: tag features to max_level_pmax
+                              #   [2]: tag features to max_level
+                              #   [3]: dg4est-v1 scheme
+regrid_nspread: 0             # Number of quadrants to spread tagging
+regrid_coarsen: 1             # Coarsening flag options:
+                              #   [0]: coarsen OFF
+                              #   [1]: coarsen ON
+regrid_features: 1            # Regrid tagging based on features:
+                              #   [0]: tag features OFF
+                              #   [1]: tag features ON
+regrid_points: 0              # Regrid tagging based on points:
+                              #   [0]: tag points OFF
+                              #   [1]: tag points ON
+regrid_point_scale: 0.6       # Box radius to tag points (scales point size)
+===============================================================================
+#                                CARTDG INPUTS                                #
+===============================================================================
+----------------------
+# Polynomial Degrees #
+----------------------
+pdegree_max: 3                # Maximum p-degree
+pdegree_min: 2                # Minimum p-degree
+------------------
+# Regrid Tagging #
+------------------
+amr_ntag_methods: 1           # Number of tagging methods:
+                              # Tag_Method options:
+                              #     [1]: density below threshold
+                              #     [2]: density above threshold
+                              #     [3]: vorticity magnitude
+                              #     [4]: q-criterion magnitude
+                              #     [5]: swirl magnitude
+tag0: 3 0.25                  # Tag_Method Tag_Threshold
+
+amr_ntag_boxes: 0             # Number of fixed box regions to tag:
+box0_lo: 0.0 0.0 0.0          # xlo ylo zlo
+box0_hi: 1.0 1.0 1.0          # xhi yhi zhi
+----------------------
+# Initial Cconditions #
+----------------------
+initial_condition: 0          # Initial conditions options:
+                              #   [0]: free-stream
+                              #   [1]: isentropic vortex
+                              #   [2]: Ringleb flow
+                              #   [3]: Taylor-Green vortex
+bc_initial_condition: 0       # Boundary initial condition options:
+                              #   [0]: free-stream
+                              #   [1]: isentropic vortex
+                              #   [2]: Ringleb flow
+                              #   [3]: Taylor-Green vortex
+mach: 0.000000                # Mach number
+alpha: 0.000000               # Incidence angle
+beta: 0.000000                # Yaw angle
+gamma: 1.400000               # ratio of specific heats (air: 1.4)
+density: 1.000000             # nondimensional density
+pressure: 1.000000            # nondimensional pressure
+forces_ref_area: 1.0          # Force calculation reference area
+forces_plane: 1               # Force calculation plane:
+                              #   [1]: xy-plane
+                              #   [2]: xz-plane
+                              #   [3]: yz-plane
+
+-----------------------
+# Boundary Conditions #
+-----------------------
+bc_xlo: 4                     # Boundary condition options:
+bc_xhi: 4                     #   [1]: free stream
+bc_ylo: 4                     #   [2]: slip wall
+bc_yhi: 4                     #   [3]: no-slip wall
+bc_zlo: 4                     #   [4]: characteristic
+bc_zhi: 4
+
+UBC_nboxes: 0                 # Number of box zones to set Unstructured BCs
+UBC0_bc: 3                    # Boundary condition type
+UBC0_lo: -1.0 -1.0 -1.0       # xlo ylo zlo
+UBC0_hi:  1.0  1.0  1.0       # xhi yhi zhi
+---------------------
+# Basis Integration #
+---------------------
+collocation: 1                # Collocation flag: 
+                              #   [0]: OFF (tensor operations)
+                              #   [1]: ON
+overintegration_npts: 0       # Number of over-integration points
+------------------
+# Riemann Solver #
+------------------
+iriemann: 2                   # Riemann solver options:
+                              #   [0]: Lax Friedrichs
+                              #   [1]: Roe
+                              #   [2]: Roe with entropy fix
+                              #   [3]: Low Mach Roe (TODO)
+riemann_diss_scaler: 1.0      # Flux dissipation scale factor
+                              #   [0.0]: no dissipation
+                              #   [1.0]: regular dissipation
+------------------
+# Discretization #
+------------------
+isplit_form: 0                # Split formulation options:
+                              #   [0]: standard DG weak form
+                              #   [1]: standard DG strong Form (TODO)
+                              #   [2]: Pirozzoli (TODO)
+                              #   [3]: Kennedy & Gruber (TODO)
+------------------------
+# Turbulence Equations #
+------------------------
+iturb: 3                      # Turbulence equation options:
+                              #   [0]: inviscid
+                              #   [1]: laminar compressible Navier-Stokes (no model)
+                              #   [2]: LES-local WALE model
+                              #   [3]: LES-local constant smagorinsky model
+                              #   [4]: LES-WALE model 
+                              #   [5]: LES-constant smagorinsky model
+                              #   [6]: LES-dynamic  smagorinsky model
+                              #   [7]: LES-TKE transport model (TODO)
+prandtl_num: 0.72             # Prantdl number
+reynolds_num: 1.2E+6          # Reynolds number
+reynolds_length: 3.1          # Reynolds length
+sip_penalty_scaler: 1.0       # Symmetric Interior Penalty scale factor
+                              #   [1.0]: theoretical
+                              #   [6.0]: CartDG-v2 value
+------------------
+# LES Parameters #
+------------------
+smagorinsky_scaler: 1.0       # Constant Smagorinsky scale factor
+smagorinsky_const: 0.17       # Constant Smagorinsky parameter (0.12-0.19)
+smagorinsky_ratio_max:  1.0   # Dynamic  Smagorinsky max ratio limit
+smagorinsky_ratio_min:  0.0   # Dynamic  Smagorinsky min ratio limit
+prandtl_turb: 0.90            # Turbulent Prandtl number
+test_filter_pdegree: 1	      # Dynamic test filter p-degree (p-degree/2)
+-----------
+# Sources #
+-----------
+source_gravity: 0             # Gravity source flag (TODO)
+source_coriolis: 0            # Coriolis source flag (TODO)
+
+altitude_direction: y
+heading_direction: z
+degrees_latitude: 0.0         # Latitude on Earth
+compass_angle: 0.0            # Compass angle of free stream direction on Earth
+-------------
+# Filtering #
+-------------
+ifilter: 0                    # Solution filter options: (TODO)
+                              #   [0]: no filtering
+                              #   [1]: model cut-off filtering
+grid_filter_pdegree: 0        # Solution filter cut-off p-degree
+filter_bc_xlo: 0 0            # xlo boundary cell filter: <[0]: OFF, [1]: ON> <filter p-degree>
+filter_bc_xhi: 0 0            # xhi boundary cell filter: <[0]: OFF, [1]: ON> <filter p-degree>
+filter_bc_ylo: 0 0            # ylo boundary cell filter: <[0]: OFF, [1]: ON> <filter p-degree>
+filter_bc_yhi: 0 0            # yhi boundary cell filter: <[0]: OFF, [1]: ON> <filter p-degree>
+filter_bc_zlo: 0 0            # zlo boundary cell filter: <[0]: OFF, [1]: ON> <filter p-degree>
+filter_bc_zhi: 0 0            # zhi boundary cell filter: <[0]: OFF, [1]: ON> <filter p-degree>
+-------------------------
+# Artificial Viscosity #
+-------------------------
+artificial_viscosity: 0       # Artificial viscosity flag
+av_scale_factor: 1.0          # AV scaling factor
+av_activation_limit: 1.0e-8   # AV activation limit (~1E-6)
