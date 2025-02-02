@@ -222,7 +222,7 @@ void search_p4est(double *xsearch,int *process_id,int *cell_id,int *numpts){
 
     if(near_body){
         for(j = 0; j < npts; j++){
-            if(cell_id[j] == -1) printf("[driver] oh no pt not found in p4est search rank: %d pt: %d\n",d->rank,j);
+            if(cell_id[j] == -1) printf("[wake3d] Point not found in p4est search rank: %d pt: %d\n",d->rank,j);
         }
     }
 

@@ -32,7 +32,7 @@ int find_keyword_three_doubles(char* filename, char *keyword, double *dbl1, doub
     }
   }
 
-  if(mandatory) printf("\033[1;31m[driver] Mandatory Keyword [%s] not found!\033[0m\n",keyword);
+  if(mandatory) printf("\033[1;31m[wake3d] Mandatory Keyword [%s] not found!\033[0m\n",keyword);
   fclose(fp);
   return 1;
 }
@@ -52,7 +52,7 @@ int find_keyword_integer(char* filename, char *keyword, int *integer, char manda
     }
   }
 
-  if(mandatory) printf("\033[1;31m[driver] Mandatory Keyword [%s] not found!\033[0m\n",keyword);
+  if(mandatory) printf("\033[1;31m[wake3d] Mandatory Keyword [%s] not found!\033[0m\n",keyword);
   fclose(fp);
   return 1;
 }
@@ -74,7 +74,7 @@ int find_keyword_two_integers(char* filename, char *keyword, int *integer1, int 
     }
   }
 
-  if(mandatory) printf("\033[1;31m[driver] Mandatory Keyword [%s] not found!\033[0m\n",keyword);
+  if(mandatory) printf("\033[1;31m[wake3d] Mandatory Keyword [%s] not found!\033[0m\n",keyword);
   fclose(fp);
   return 1;
 }
@@ -102,7 +102,7 @@ int find_keyword_string(char *filename, char *keyword, char *string, char mandat
       string[strcspn(string, "\n")] = 0;
 
       if(strlen(string) >= buff_size){
-        printf("[driver] warning string length greater than buff_size set in driver.h : %lu out of %d\n",strlen(string),buff_size);
+        printf("[wake3d] Warning: string length greater than buff_size set in driver.h : %lu out of %d\n",strlen(string),buff_size);
       }
 
       fclose(fp);
@@ -110,7 +110,7 @@ int find_keyword_string(char *filename, char *keyword, char *string, char mandat
     }
   }
 
-  if(mandatory) printf("\033[1;31m[driver] Mandatory Keyword [%s] not found!\033[0m\n",keyword);
+  if(mandatory) printf("\033[1;31m[wake3d] Mandatory Keyword [%s] not found!\033[0m\n",keyword);
   fclose(fp);
   return 1;
 }

@@ -975,11 +975,11 @@ void driver_finalize(){
     int alloc_count = get_alloc_count();
 
     //if(alloc_count > 0) printf("[wake3d] Memory leak %d on proc %d\n",alloc_count,rank);
-    //if(alloc_count < 0) printf("[driver] Alloc count is negative %d on proc %d\n",alloc_count,rank);
+    //if(alloc_count < 0) printf("[wake3d] Alloc count is negative %d on proc %d\n",alloc_count,rank);
 
     alloc_count = abs(alloc_count);
     MPI_Reduce(&alloc_count,&max_alloc_count,1,MPI_INT,MPI_MAX,0,mpicomm);
-    if(max_alloc_count == 0 && rank == 0) printf("[driver] YAY no memory leaks!\n");
+    if(max_alloc_count == 0 && rank == 0) printf("[wake3d] YAY no memory leaks!\n");
 
     MPI_Finalize();
 }

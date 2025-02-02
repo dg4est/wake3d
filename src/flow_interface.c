@@ -161,7 +161,7 @@ void flow_output_solution(int t){
   d->flow->output_solution(&t);
   double t2 = MPI_Wtime();
 
-  if(d->group_master_flag) printf("[driver] group: %d output solution time: %e seconds \n",d->group,t2-t1);
+  if(d->group_master_flag) printf("[wake3d] Group: %d output solution time (sec): %e\n",d->group,t2-t1);
 
 };
 

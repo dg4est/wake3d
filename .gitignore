@@ -1,0 +1,8 @@
+*.o
+*.mod
+*.so
+*.a
+
+bin
+builds/
+install/
