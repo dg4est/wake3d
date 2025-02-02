@@ -20,6 +20,7 @@ extern driver_t *d;
 void driver_go(){
     double a,b;
     int i,ind;
+    double t1,t2;
 
     ind = d->restart_counter;
     if(d->rank_master_flag){LINEBREAK};
@@ -31,9 +32,16 @@ void driver_go(){
     }
     ind++;
 
+    MPI_Barrier(d->mpicomm);
+    if(d->rank_master_flag) {LINEBREAKSET; fflush(stdout);}
+
     /* perform time steps */
     for (i = 1; i <= d->number_time_steps; ++ind,++i) {
-        if(d->rank_master_flag) printf("[wake3d] Time Step: %d\n",i);
+        t1 = MPI_Wtime();
+        if (d->rank_master_flag) {
+            printf(" [wake3d]   Time Step: %7d  --sec--\n",i);
+            fflush(stdout);
+        }
 
         /* check input file changes */
         check_input_file();
@@ -64,7 +72,10 @@ void driver_go(){
             // driver_igbp_regrid(0);
         }
         MPI_Barrier(d->mpicomm);
+        t2 = MPI_Wtime();
         if(d->rank_master_flag){LINEBREAK};
+        if(d->rank_master_flag){printf(" Step: %d, cpu time (sec): %f\n",i,t2-t1);}
+        if(d->rank_master_flag){LINEBREAKSET};
     }
     flow_output_solution(ind);
 
@@ -85,7 +96,7 @@ void spin_test(){
 
     /* perform time steps */
     for (i = 1; i <= d->number_time_steps; ++ind,++i) {
-        if(d->rank_master_flag) printf("[wake3d] time step: %d \n",i);
+        if(d->rank_master_flag) printf(" [wake3d] Time step: %d\n",i);
 
         driver_time_step_nearbody_move();
         if(i%d->plot_interval == 0) flow_output_solution(ind);
@@ -171,7 +182,7 @@ void driver_time_step(){
 
     wtime = t2-t1;
     MPI_Reduce(&wtime,&max_wtime,1,MPI_DOUBLE_PRECISION,MPI_MAX,0,d->group_comm);
-    if(d->group_master_flag) printf("[wake3d]  Solver group %d time (sec): %e\n",d->group,max_wtime);
+    if(d->group_master_flag) printf("   Grp[%4d][%8s] SOLVER: %f\n",d->group,d->flow->solver_so_name,max_wtime);
 
     /* check if ncyc is modified on fly based on wall-time */
     if(!d->increase_ncyc_flag) return;
@@ -224,9 +235,11 @@ void driver_obc_regrid(){
     double t4 = MPI_Wtime();
 
     if (d->rank_master_flag) {
-        printf("[wake3d] Gather obc time (sec): %e\n",t2-t1);
-        printf("[wake3d] Flow regrid time (sec): %e\n",t3-t2);
-        printf("[wake3d] Tioga register and connect time (sec): %e \n",t4-t3);
+        LINEBREAK;
+        printf(" [wake3d] REGRID/OVERSET TIMINGS (sec):\n");
+        printf("          IGBP:    %f\n",t2-t1);
+        printf("          REGRID:  %f\n",t3-t2);
+        printf("          OVERSET: %f\n",t4-t3);
     }
 }
 
@@ -235,7 +248,6 @@ void driver_igbp_regrid(int efficient){
     /* Non-efficient gather is needed to initialize a tree structure in dg4est */
     /* Use non-efficient on first igbp call and efficient on later ones        */
     /* ======================================================================= */
-
     MPI_Barrier(d->mpicomm);
     double t1 = MPI_Wtime();    /* gather obc */
         if (efficient) {
@@ -256,9 +268,11 @@ void driver_igbp_regrid(int efficient){
     double t4 = MPI_Wtime();
 
     if (d->rank_master_flag) {
-        printf("[wake3d] Gather igbp time (sec): %e\n",t2-t1);
-        printf("[wake3d] Flow regrid time (sec): %e\n",t3-t2);
-        printf("[wake3d] Tioga register and connect time (sec): %e\n",t4-t3);
+        LINEBREAK;
+        printf(" [wake3d] REGRID/OVERSET TIMINGS (sec):\n");
+        printf("          IGBP:    %e\n",t2-t1);
+        printf("          REGRID:  %e\n",t3-t2);
+        printf("          OVERSET: %e\n",t4-t3);
     }
 }
 
@@ -294,7 +308,7 @@ void read_input_file(int argc, char **argv){
         printf("[wake3d] Input file does not exist.\n");
         printf("         Usage: ./wake3d.mpi <input.file>\n");
         exit(1);
-    } 
+    }
 
     if (getcwd(cwd,sizeof(cwd)) != NULL) {
         char *pwd = trimwhitespace(cwd);
@@ -401,6 +415,8 @@ void read_input_file(int argc, char **argv){
     err = find_keyword_string(filename, keyword, d->flow->solver_so_file, 1);
     err = find_keyword_string(filename, "tioga_so_file:",d->tioga->tioga_so_file, 1);
     err = find_keyword_string(filename, "visit_so_file:",d->visit->visit_so_file, 0);
+
+    extractLibraryName(d->flow->solver_so_file,d->flow->solver_so_name);
 
     d->visit->visit_flag = (err) ? 0:1;
     if(err && d->rank == 0) printf("[wake3d] Warning: visit shared library not found\n");

@@ -156,12 +156,11 @@ void flow_set_pointers(){
 }
 
 void flow_output_solution(int t){
-
-  double t1 = MPI_Wtime();
+  double t1,t2;
+  t1 = MPI_Wtime();
   d->flow->output_solution(&t);
-  double t2 = MPI_Wtime();
-
-  if(d->group_master_flag) printf("[wake3d] Group: %d output solution time (sec): %e\n",d->group,t2-t1);
+  t2 = MPI_Wtime();
+  if(d->group_master_flag) if(d->group_master_flag) printf("   Grp[%4d][%8s] OUTPUT: %f\n",d->group,d->flow->solver_so_name,t2-t1);
 
 };
 

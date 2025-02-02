@@ -20,8 +20,10 @@
 #include <libgen.h>
 #include <sys/stat.h>
 
-#define LINEBREAK {int e; printf("+"); for(e = 0; e < 60; ++e) printf("="); printf("+\n");}
+#define LINEBREAK {int e; printf(" "); for(e = 0; e < 60; ++e) printf("-"); printf(" \n");}
+#define LINEBREAKSET {int e; printf("+"); for(e = 0; e < 60; ++e) printf("="); printf("+\n");}
 
+#if 0
 static inline
 double memory_usage(int mpi_rank,int timestep,int display){
 
@@ -64,6 +66,7 @@ double memory_usage(int mpi_rank,int timestep,int display){
     }
     return used_mem;
 }
+#endif
 
 static inline
 int file_is_modified(const char *path,time_t oldMTime){
@@ -92,6 +95,41 @@ char *trimwhitespace(char *str){
     // Write new null terminator character
     end[1] = '\0';
     return str;
+}
+
+// Custom function to find the last occurrence of a substring (like strrchr but for strings)
+static
+const char* strrstr(const char *haystack, const char *needle) {
+    const char *result = NULL;
+    const char *p = strstr(haystack, needle);
+    while (p) {
+        result = p;
+        p = strstr(p + 1, needle); // Keep searching for later occurrences
+    }
+    return result;
+}
+
+static
+void extractLibraryName(const char *path, char *output) {
+    const char *libPos = strrstr(path, "lib"); // Find last occurrence of "lib"
+    if (!libPos) {
+        output[0] = '\0'; // Return empty string if "lib" is not found
+        return;
+    }
+
+    libPos += 3; // Move past "lib"
+
+    const char *soPos = strrstr(libPos, ".so"); // Find last occurrence of ".so"
+    if (!soPos || soPos <= libPos) {
+        output[0] = '\0'; // Return empty string if ".so" not found or misplaced
+        return;
+    }
+
+    size_t len = soPos - libPos; // Length of extracted name
+    if(len >= buff_size) len = buff_size - 1; // Ensure no overflow
+
+    strncpy(output, libPos, len);
+    output[len] = '\0'; // Null-terminate the string
 }
 
 /* main driver routines */

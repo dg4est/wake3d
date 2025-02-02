@@ -43,6 +43,7 @@ typedef struct igbp {
 typedef struct flow_solver {
 
   char solver_so_file[buff_size];
+  char solver_so_name[buff_size];
   void *group_handle;
   int receptor_only_flag;
 
