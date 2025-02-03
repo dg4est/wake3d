@@ -6,14 +6,16 @@
 //  Copyright © 2017 Michael J. Brazell. All rights reserved.
 //
 
+/* header files */
+#include "driver.h"
+#include "input.h"
+#include "alloc.h"
+
+/* system header files */
 #include <unistd.h>
 #include <sys/time.h>
 #include <sys/resource.h>
 #include <stdlib.h>
-
-#include "driver.h"
-#include "input.h"
-#include "alloc.h"
 
 extern driver_t *d;
 
@@ -42,6 +44,9 @@ void driver_go(){
             printf(" [wake3d]   Time Step: %7d  --sec--\n",i);
             fflush(stdout);
         }
+
+        /* display memory */
+        //if(d->group_master_flag) memory_usage(d->rank,i,1,1,1);
 
         /* check input file changes */
         check_input_file();
@@ -182,7 +187,7 @@ void driver_time_step(){
 
     wtime = t2-t1;
     MPI_Reduce(&wtime,&max_wtime,1,MPI_DOUBLE_PRECISION,MPI_MAX,0,d->group_comm);
-    if(d->group_master_flag) printf("   Grp[%4d][%8s] SOLVER: %f\n",d->group,d->flow->solver_so_name,max_wtime);
+    if(d->group_rank==0) {printf("   Grp[%4d][%8s] SOLVER: %f\n",d->group,d->flow->solver_so_name,max_wtime); fflush(stdout);}
 
     /* check if ncyc is modified on fly based on wall-time */
     if(!d->increase_ncyc_flag) return;

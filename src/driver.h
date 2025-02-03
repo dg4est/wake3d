@@ -9,63 +9,86 @@
 #ifndef driver_h
 #define driver_h
 
-//#include <mpi.h>
+/* header files */
 #include "input.h"
 #include "defs.h"
-#include <malloc.h>
-#include <stdlib.h>
+#include "colors.h"
+
+/* system header files */
+#include <sys/stat.h>
+#include <math.h>
+#include <stdio.h>
 #include <ctype.h>
 #include <errno.h>
+#include <stdlib.h>
 #include <string.h>
 #include <libgen.h>
-#include <sys/stat.h>
 #include <limits.h>
+#ifndef __APPLE__
+#  include <malloc.h>
+#endif
+
+/* Check if glibc is at least 2.33 to use mallinfo2() */
+#if __GLIBC__ > 2 || (__GLIBC__ == 2 && __GLIBC_MINOR__ >= 33)
+#  define MALLINFO_T mallinfo2
+#else
+#  define MALLINFO_T mallinfo
+#endif
 
 #define LINEBREAK {int e; printf(" "); for(e = 0; e < 60; ++e) printf("-"); printf(" \n");}
 #define LINEBREAKSET {int e; printf("+"); for(e = 0; e < 60; ++e) printf("="); printf("+\n");}
 
-#if 0
+#if 1
 static inline
-double memory_usage(int mpi_rank,int timestep,int display){
-
-    /* get malloc info structure */
-    struct mallinfo my_mallinfo = mallinfo();
-
-    /*total memory reserved by the system for malloc currently */
-    double reserved_mem = my_mallinfo.arena;
+size_t memory_usage(int mpi_rank,int timestep,int display,int details,int write2file){
+#ifndef __APPLE__
+    const double B2GB = 1.0/(1024.0 * 1024.0 * 1024.0);
+    const double B2MB = 1.0/(1024.0 * 1024.0);
+    struct MALLINFO_T mi = MALLINFO_T();
 
     /* get all the memory currently allocated to user by malloc, etc. */
-    double used_mem = my_mallinfo.hblkhd
-                    + my_mallinfo.usmblks
-                    + my_mallinfo.uordblks;
+    size_t used_mem = (size_t) mi.hblkhd
+                    + (size_t) mi.usmblks
+                    + (size_t) mi.uordblks;
 
-    /* get memory not currently allocated to user but malloc controls */
-    double free_mem = my_mallinfo.fsmblks
-                    + my_mallinfo.fordblks;
-
-    /* get number of items currently allocated */
-    /* double number_allocated = my_mallinfo.ordblks + my_mallinfo.smblks; */
-
-    /* Print out concise malloc info line */
-    if(display && mpi_rank == 0){
-        printf("Step[%d]: %f MB(%.0f) malloc: %f MB reserved (%.0f unused)\n",
-            timestep,
-            used_mem / (1024.0 * 1024.0),
-            used_mem,
-            reserved_mem / (1024.0 * 1024.0),
-            free_mem);
-
- 	if(mpi_rank == 0){
-            FILE *fp;
-	    char filename[] = "new_memusage.dat";
-    	    fp=fopen(filename,"a+");
-            fprintf(fp,"Step[%d]: %f MB(%.0f) malloc: %f MB reserved (%.0f unused)\n",
-	            timestep,used_mem / (1024.0 * 1024.0),used_mem,reserved_mem / (1024.0 * 1024.0), free_mem);
-            fclose(fp);
-  	}
+    /* print out concise malloc info line */
+    if (display) {
+        printf(GREEN);
+        printf("+======================= MEMORY ALLOCATION ===========================+\n");
+        printf(BIWHITE" USAGE Rank[%d] Step[%d]:" GREEN " %f GiB : %f MiB : %zu Bytes  \n",mpi_rank,timestep,used_mem*B2GB,used_mem*B2MB,used_mem);
+        if (details) {
+            printf(COLOR_OFF" --------------------------------------------------------------------- \n");
+            printf(BIWHITE" FIELDS                                    BYTES        MiB\n"GREEN);
+            printf(" Total non-mmapped bytes       (arena): %12zu\t%f\n", mi.arena   ,mi.arena   *B2MB);
+            printf(" # of free chunks            (ordblks): %12zu    \n", mi.ordblks                  );
+            printf(" # of free fastbin blocks     (smblks): %12zu    \n", mi.smblks                   );
+            printf(" # of mapped regions           (hblks): %12zu    \n", mi.hblks                    );
+            printf(" Bytes in mapped regions      (hblkhd): %12zu\t%f\n", mi.hblkhd,  mi.hblkhd  *B2MB);
+            printf(" Max. total allocated space  (usmblks): %12zu\t%f\n", mi.usmblks, mi.usmblks *B2MB);
+            printf(" Free bytes held in fastbins (fsmblks): %12zu\t%f\n", mi.fsmblks, mi.fsmblks *B2MB);
+            printf(" Total allocated space      (uordblks): %12zu\t%f\n", mi.uordblks,mi.uordblks*B2MB);
+            printf(" Total free space           (fordblks): %12zu\t%f\n", mi.fordblks,mi.fordblks*B2MB);
+            printf(" Topmost releasable block   (keepcost): %12zu\t%f\n", mi.keepcost,mi.keepcost*B2MB);
+        }
+        printf("+=====================================================================+\n");
+        printf(COLOR_OFF);
+        fflush(stdout);
 
     }
+
+    /* write out concise malloc info line */
+    if (write2file) {
+        char filename[128];
+        snprintf(filename, sizeof(filename), "wake3d.mem.%d.txt", mpi_rank);
+
+        FILE *fp = fopen(filename,"a+");
+        fprintf(fp,"%6d\t%f GiB : %f MiB : %zu Bytes\n",timestep,used_mem*B2GB,used_mem*B2MB,used_mem);
+        fclose(fp);
+    }
     return used_mem;
+#else
+    return 0.0;
+#endif
 }
 #endif
 
