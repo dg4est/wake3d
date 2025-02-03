@@ -55,25 +55,24 @@ size_t memory_usage(int mpi_rank,int timestep,int display,int details,int write2
     if (display) {
         printf(GREEN);
         printf("+======================= MEMORY ALLOCATION ===========================+\n");
-        printf(BIWHITE" USAGE Rank[%d] Step[%d]:" GREEN " %f GiB : %f MiB : %zu Bytes  \n",mpi_rank,timestep,used_mem*B2GB,used_mem*B2MB,used_mem);
+        printf(BIWHITE " USAGE Rank[%d] Step[%d]:" GREEN " %f GiB : %f MiB : %zu Bytes  \n",mpi_rank,timestep,used_mem*B2GB,used_mem*B2MB,used_mem);
         if (details) {
-            printf(COLOR_OFF" --------------------------------------------------------------------- \n");
-            printf(BIWHITE" FIELDS                                    BYTES        MiB\n"GREEN);
-            printf(" Total non-mmapped bytes       (arena): %12zu\t%f\n", mi.arena   ,mi.arena   *B2MB);
-            printf(" # of free chunks            (ordblks): %12zu    \n", mi.ordblks                  );
-            printf(" # of free fastbin blocks     (smblks): %12zu    \n", mi.smblks                   );
-            printf(" # of mapped regions           (hblks): %12zu    \n", mi.hblks                    );
-            printf(" Bytes in mapped regions      (hblkhd): %12zu\t%f\n", mi.hblkhd,  mi.hblkhd  *B2MB);
-            printf(" Max. total allocated space  (usmblks): %12zu\t%f\n", mi.usmblks, mi.usmblks *B2MB);
-            printf(" Free bytes held in fastbins (fsmblks): %12zu\t%f\n", mi.fsmblks, mi.fsmblks *B2MB);
-            printf(" Total allocated space      (uordblks): %12zu\t%f\n", mi.uordblks,mi.uordblks*B2MB);
-            printf(" Total free space           (fordblks): %12zu\t%f\n", mi.fordblks,mi.fordblks*B2MB);
-            printf(" Topmost releasable block   (keepcost): %12zu\t%f\n", mi.keepcost,mi.keepcost*B2MB);
+            printf(COLOR_OFF " --------------------------------------------------------------------- \n");
+            printf(BIWHITE " FIELDS                                    BYTES        MiB\n" GREEN);
+            printf(" Total non-mmapped bytes       (arena): %12zu\t%f\n", (size_t)mi.arena   ,mi.arena   *B2MB);
+            printf(" # of free chunks            (ordblks): %12zu    \n", (size_t)mi.ordblks                  );
+            printf(" # of free fastbin blocks     (smblks): %12zu    \n", (size_t)mi.smblks                   );
+            printf(" # of mapped regions           (hblks): %12zu    \n", (size_t)mi.hblks                    );
+            printf(" Bytes in mapped regions      (hblkhd): %12zu\t%f\n", (size_t)mi.hblkhd,  mi.hblkhd  *B2MB);
+            printf(" Max. total allocated space  (usmblks): %12zu\t%f\n", (size_t)mi.usmblks, mi.usmblks *B2MB);
+            printf(" Free bytes held in fastbins (fsmblks): %12zu\t%f\n", (size_t)mi.fsmblks, mi.fsmblks *B2MB);
+            printf(" Total allocated space      (uordblks): %12zu\t%f\n", (size_t)mi.uordblks,mi.uordblks*B2MB);
+            printf(" Total free space           (fordblks): %12zu\t%f\n", (size_t)mi.fordblks,mi.fordblks*B2MB);
+            printf(" Topmost releasable block   (keepcost): %12zu\t%f\n", (size_t)mi.keepcost,mi.keepcost*B2MB);
         }
         printf("+=====================================================================+\n");
         printf(COLOR_OFF);
         fflush(stdout);
-
     }
 
     /* write out concise malloc info line */
