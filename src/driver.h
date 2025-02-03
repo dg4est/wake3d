@@ -19,6 +19,7 @@
 #include <string.h>
 #include <libgen.h>
 #include <sys/stat.h>
+#include <limits.h>
 
 #define LINEBREAK {int e; printf(" "); for(e = 0; e < 60; ++e) printf("-"); printf(" \n");}
 #define LINEBREAKSET {int e; printf("+"); for(e = 0; e < 60; ++e) printf("="); printf("+\n");}

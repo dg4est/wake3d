@@ -439,6 +439,11 @@ void read_input_file_options(){
     /* write out optional inputs to screen */
     display_optional_inputs();
 
+    /* check safe inputs */
+    if(d->plot_interval     <= 0) d->plot_interval = INT_MAX;
+    if(d->regrid_interval   <= 0) d->regrid_interval = INT_MAX;
+    if(d->number_time_steps <= 0) d->number_time_steps = INT_MAX;
+
     /* file state for checking runtime modifications */
     stat(filename,&file_stat);
     d->input_file_mod_time = file_stat.st_mtime;
