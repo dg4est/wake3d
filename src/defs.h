@@ -13,6 +13,15 @@
 #include <mpi.h>
 #include <sys/stat.h>
 
+/* OVERSET STAT/TIMING MASKS */
+#define MASK_STAT_OUTPUT   0b00000001 // total receptors/holes
+#define MASK_STAT_HOLEMAP  0b00000010 // adaptive hole map stats
+#define MASK_TIME_REGISTER 0b00000100 // register grid data timing
+#define MASK_TIME_PROFILE  0b00001000 // mesh profile timing
+#define MASK_TIME_CONN     0b00010000 // connectivity timing
+#define MASK_TIME_CONNHIGH 0b00100000 // high-order connectivity timing
+#define MASK_TIME_UPDATE   0b01000000 // data update timing
+
 /* outer boundary condition points for tagging on the off-body */
 typedef struct obc {
   int nobc;   /**< number of obc points */
@@ -46,6 +55,7 @@ typedef struct flow_solver {
   char solver_so_name[buff_size];
   void *group_handle;
   int receptor_only_flag;
+  int tacc_flag;
 
   /* mandatory callback functions */
   void (*initialize_group_mpi)(int *group_comm);
@@ -149,6 +159,7 @@ typedef struct tioga {
   void (*setsymmetry)();
   void (*setcomposite)(int *ncomp); /**< set the number of composite bodies */
   void (*writeoutputfiles)();
+  void (*setverbose)(int *verbose); /**< set verbosity flag: [0] OFF, [1] ON */
 
 } tioga_t;
 
@@ -202,6 +213,7 @@ typedef struct driver {
   int number_time_steps;      /**< number of time steps to perform in the simulation */
   int off_body_group;         /**< identifies the off body group */
   int ncyc;                   /**< near-body sub-iteration count */
+  int overset_verbose;        /**< set overset verbosity flag */
 
   /** group identification for all procs */
   int *group_solver_id;       /**< solver id for each group */

@@ -173,6 +173,7 @@ void driver_time_step_nearbody_move(){
 void driver_time_step(){
     static int increase_ncyc_h = 0;
     double t1,t2,wtime,max_wtime;
+    const int tacc = d->flow->tacc_flag;
     int ncyc;
 
     flow_real2ghost();
@@ -181,8 +182,8 @@ void driver_time_step(){
 
     t1 = MPI_Wtime(); /* start timer */
         ncyc = d->ncyc + increase_ncyc_h;
-        d->flow->unsteady_update(&ncyc);
-      //d->flow->steady_update(&ncyc);
+        (tacc) ? d->flow->unsteady_update(&ncyc):
+                 d->flow->steady_update(&ncyc);
     t2 = MPI_Wtime(); /* stop timer */
 
     wtime = t2-t1;
@@ -275,9 +276,9 @@ void driver_igbp_regrid(int efficient){
     if (d->rank_master_flag) {
         LINEBREAK;
         printf(" [wake3d] REGRID/OVERSET TIMINGS (sec):\n");
-        printf("          IGBP:    %e\n",t2-t1);
-        printf("          REGRID:  %e\n",t3-t2);
-        printf("          OVERSET: %e\n",t4-t3);
+        printf("          IGBP:    %f\n",t2-t1);
+        printf("          REGRID:  %f\n",t3-t2);
+        printf("          OVERSET: %f\n",t4-t3);
     }
 }
 
@@ -291,9 +292,53 @@ void display_optional_inputs(){
         printf(" number_time_steps: %d\n",d->number_time_steps);
         printf(" ncyc: %d\n",d->ncyc);
         printf(" variable_ncyc_flag: %d\n",d->increase_ncyc_flag);
+	printf(" overset_verbose_flag: %d\n",d->overset_verbose);
         printf("+==========================================+\n");
         printf("\n");
     }
+}
+
+void read_input_file_verbose_flags(){
+    char *filename = d->input_file;
+
+    int OVERSET_STAT_OUTPUT=0;   // 0b00000001 // total receptors/holes
+    int OVERSET_STAT_HOLEMAP=0;  // 0b00000010 // adaptive hole map stats
+    int OVERSET_TIME_REGISTER=0; // 0b00000100 // register grid data timing
+    int OVERSET_TIME_PROFILE=0;  // 0b00001000 // mesh profile timing
+    int OVERSET_TIME_CONN=0;     // 0b00010000 // connectivity timing
+    int OVERSET_TIME_CONNHIGH=0; // 0b00100000 // high-order connectivity timing
+    int OVERSET_TIME_UPDATE=0;   // 0b01000000 // data update timing
+    int verbose_flag=0;
+
+    find_keyword_integer(filename, "overset_verbose_flag:",&verbose_flag,0);
+    if (verbose_flag == -1) {
+        d->overset_verbose = MASK_STAT_OUTPUT |
+                             MASK_STAT_HOLEMAP |
+                             MASK_TIME_REGISTER |
+                             MASK_TIME_PROFILE |
+                             MASK_TIME_CONN |
+                             MASK_TIME_CONNHIGH |
+                             MASK_TIME_UPDATE;
+        return;
+    } 
+    if(verbose_flag !=0 ) return; // return if flag set directly
+    
+    find_keyword_integer(filename, "overset_stat_output:", &OVERSET_STAT_OUTPUT,0);
+    find_keyword_integer(filename, "overset_stat_holemap:",&OVERSET_STAT_HOLEMAP,0);
+    find_keyword_integer(filename, "overset_time_register:",&OVERSET_TIME_REGISTER,0);
+    find_keyword_integer(filename, "overset_time_profile:",&OVERSET_TIME_PROFILE,0);
+    find_keyword_integer(filename, "overset_time_conn:",&OVERSET_TIME_CONN,0);
+    find_keyword_integer(filename, "overset_time_connhigh:",&OVERSET_TIME_CONNHIGH,0);
+    find_keyword_integer(filename, "overset_time_update:",&OVERSET_TIME_UPDATE,0);
+
+    d->overset_verbose = 0;
+    if(OVERSET_STAT_OUTPUT)   d->overset_verbose |= MASK_STAT_OUTPUT;
+    if(OVERSET_STAT_HOLEMAP)  d->overset_verbose |= MASK_STAT_HOLEMAP;
+    if(OVERSET_TIME_REGISTER) d->overset_verbose |= MASK_TIME_REGISTER;
+    if(OVERSET_TIME_PROFILE)  d->overset_verbose |= MASK_TIME_PROFILE;
+    if(OVERSET_TIME_CONN)     d->overset_verbose |= MASK_TIME_CONN;
+    if(OVERSET_TIME_CONNHIGH) d->overset_verbose |= MASK_TIME_CONNHIGH;
+    if(OVERSET_TIME_UPDATE)   d->overset_verbose |= MASK_TIME_UPDATE;
 }
 
 void read_input_file(int argc, char **argv){
@@ -355,9 +400,10 @@ void read_input_file(int argc, char **argv){
     d->flow->translation[1] = 0.0;
     d->flow->translation[2] = 0.0;
     d->flow->receptor_only_flag = 0;
+    d->flow->tacc_flag = 1;
     d->ncyc = 25;
     d->increase_ncyc_flag = 0;
-
+    d->overset_verbose = 0;
     d->spin_test = 0;
 
     /* non-mandatory inputs */
@@ -370,6 +416,7 @@ void read_input_file(int argc, char **argv){
     find_keyword_integer(filename, "ncyc:",             &d->ncyc,             0);
     find_keyword_integer(filename, "spin_test:",        &d->spin_test,        0);
     find_keyword_integer(filename, "variable_ncyc_flag:",&d->increase_ncyc_flag,0);
+    read_input_file_verbose_flags();
 
     /* check for nonsense inputs */
     if(d->number_time_steps < 0) d->number_time_steps = 10000000;
@@ -416,6 +463,9 @@ void read_input_file(int argc, char **argv){
     sprintf(keyword,"receptor_only%d:",group_temp);
     find_keyword_integer(filename,keyword,&d->flow->receptor_only_flag,1);
 
+    sprintf(keyword,"tacc%d:",group_temp);
+    find_keyword_integer(filename,keyword,&d->flow->tacc_flag,0);
+
     sprintf(keyword, "so%d:", d->group_solver_id[group_temp]);
     err = find_keyword_string(filename, keyword, d->flow->solver_so_file, 1);
     err = find_keyword_string(filename, "tioga_so_file:",d->tioga->tioga_so_file, 1);
@@ -433,6 +483,7 @@ void read_input_file(int argc, char **argv){
 void read_input_file_options(){
     char *filename = d->input_file;
     struct stat file_stat;
+    int tioga_verbose;
 
     /* non-mandatory inputs */
     find_keyword_integer(filename, "regrid_interval:",   &d->regrid_interval,  0);
@@ -440,6 +491,9 @@ void read_input_file_options(){
     find_keyword_integer(filename, "number_time_steps:", &d->number_time_steps,0);
     find_keyword_integer(filename, "ncyc:",              &d->ncyc,             0);
     find_keyword_integer(filename, "variable_ncyc_flag:",&d->increase_ncyc_flag,0);
+
+    read_input_file_verbose_flags();
+    d->tioga->setverbose(&d->overset_verbose);
 
     /* write out optional inputs to screen */
     display_optional_inputs();
@@ -500,6 +554,7 @@ void driver_initialize(int argc, char **argv){
 
     /* initialize tioga mpi */
     d->tioga->init(d->mpicomm);
+    d->tioga->setverbose(&d->overset_verbose);
 
     /* TODO: Implement into input file */
     /* initialize composite bodies */

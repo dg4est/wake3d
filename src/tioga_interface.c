@@ -81,6 +81,9 @@ void tioga_load_dynamic_library() {
 
   *(void **)(&t->setcomposite) = dlsym(t->group_handle, "tioga_setcomposite_");
   if ((error = dlerror()) != NULL) {fputs(error, stderr);}
+
+  *(void **)(&t->setverbose) = dlsym(t->group_handle, "tioga_setverbosity_");
+  if ((error = dlerror()) != NULL) {fputs(error, stderr);}
 }
 
 void tioga_set_p4est(){
